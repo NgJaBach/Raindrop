@@ -1,19 +1,9 @@
 """Here is an initial version of the proposed Raindrop model. The scripts will be further refined in the future, after paper acceptance. """
-wandb = False
-
-if wandb:
-    import wandb
-    os.environ['WANDB_SILENT']="true"
-
-    wandb.login(key=str('14734fe9c5574e019e8f517149a20d6fe1b2fd0d'))
-    config = wandb.config
-    run = wandb.init(project='Raindrop', entity='XZ', config={'wandb_nb':'wandb_three_in_one_hm'})
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import os
 import time
 from sklearn.metrics import roc_auc_score, classification_report, confusion_matrix, average_precision_score, precision_score, recall_score, f1_score
 from models_rd import *
@@ -285,8 +275,6 @@ for missing_ratio in missing_ratios:
             print('Stop epochs: %d, Batches/epoch: %d, Total batches: %d' % (num_epochs, n_batches, num_epochs * n_batches))
 
             start = time.time()
-            if wandb:
-                wandb.watch(model)
             for epoch in range(num_epochs):
                 model.train()
 
@@ -336,8 +324,6 @@ for missing_ratio in missing_ratios:
                     train_auroc = roc_auc_score(one_hot(train_y), train_probs)
                     train_auprc = average_precision_score(one_hot(train_y), train_probs)
 
-                if wandb:
-                    wandb.log({"train_loss": loss.item(), "train_auprc": train_auprc, "train_auroc": train_auroc})
                 if epoch == 0 or epoch == num_epochs - 1:
                     print(confusion_matrix(train_y, np.argmax(train_probs, axis=1), labels=[0, 1]))
 
@@ -362,8 +348,6 @@ for missing_ratio in missing_ratios:
                                                                                                         val_loss.item(),
                                                                                                         aupr_val * 100,
                                                                                                         auc_val * 100))
-                        if wandb:
-                            wandb.log({"val_loss": val_loss.item(), "val_auprc": aupr_val, "val_auroc": auc_val})
 
                         scheduler.step(aupr_val)
                         if auc_val > best_auc_val:
@@ -444,10 +428,6 @@ for missing_ratio in missing_ratios:
         print('Precision = %.1f +/- %.1f' % (mean_precision, std_precision))
         print('Recall    = %.1f +/- %.1f' % (mean_recall, std_recall))
         print('F1        = %.1f +/- %.1f' % (mean_F1, std_F1))
-
-    # Mark the run as finished
-    if wandb:
-        wandb.finish()
 
     # # save in numpy file
     # np.save('./results/' + arch + '_phy12_setfunction.npy', [acc_vec, auprc_vec, auroc_vec])
