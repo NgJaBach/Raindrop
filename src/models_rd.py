@@ -5,14 +5,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import os
-os.add_dll_directory('c:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/bin')
-os.add_dll_directory(os.path.dirname(__file__))
+from pathlib import Path
+
+# Best-effort CUDA DLL discovery on Windows; skip silently if paths are absent.
+def _try_add_dll_dir(path_str: str) -> None:
+    path = Path(path_str)
+    if path.exists():
+        os.add_dll_directory(str(path))
+
+
+_try_add_dll_dir(os.environ.get("CUDA_PATH", "") + "/bin")
+_try_add_dll_dir("c:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.1/bin")
+_try_add_dll_dir(os.path.dirname(__file__))
 
 from torch.nn.parameter import Parameter
 from torch_geometric.nn.inits import uniform, glorot, zeros, ones, reset
 
-from transformer_conv import TransformerConv
-from Ob_propagation import Observation_progation
+from .transformer_conv import TransformerConv
+from .Ob_propagation import Observation_progation
 import warnings
 import numbers
 

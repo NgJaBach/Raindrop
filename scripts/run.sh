@@ -9,4 +9,4 @@ echo Python path: $PYTHONPATH
 
 set -e
 
-python -m code.Raindrop
+python -m src.Raindrop

@@ -6,8 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import time
 from sklearn.metrics import roc_auc_score, classification_report, confusion_matrix, average_precision_score, precision_score, recall_score, f1_score
-from models_rd import *
-from utils_rd import *
+from .models_rd import *
+from .utils_rd import *
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 import warnings
